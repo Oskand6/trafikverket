@@ -1,18 +1,19 @@
 const puppeteer = require('puppeteer');
 
 
-
 trafikvarket1('https://fp.trafikverket.se/Boka/#/licence');
-//trafikvarket2('inget');
+trafikvarket2('Inget här än');
 
 
 async function trafikvarket1(url) {
 
-    //bil = 200412063596 
-const personnummer = '200403305378';
-const stad = 'Örebro';
+    // 200412063596 200403305378
+const personnummer = '200412063596';
+//const stad = 'Örebro';
+const stad = 'Vänersborg';
 const körkort = 'A2';
-const tidigareTid = true;
+const tidigareTid = false;
+const teoriprov = false;
 //const dinTid = tidigastdatum;
 //2022-03-30 format 
 //behöver inte svaras på om tidigareTid = false
@@ -27,13 +28,13 @@ const tidigareTid = true;
 
     if(körkort=='A')
     await page.click('a[title="A"]');
-    if(körkort=='A1')
+    else if(körkort=='A1')
     await page.click('a[title="A1"]');
-    if(körkort=='A2')
+    else if(körkort=='A2')
     await page.click('a[title="A2"]');
-    if(körkort=='B')
+    else if(körkort=='B')
     await page.click('a[title="B"]');
-
+    else{ console.log('Du har inte valt en giltig körkortstyp');  browser.close();}
    
 
     if(tidigareTid){
@@ -41,7 +42,13 @@ const tidigareTid = true;
     await page.click('div[class="row alreadyBookedExamination"]'); }
     else{
         await page.waitForSelector('div[class="row suggestedReservations"]');
-        await page.click('div[class="row suggestedReservations"]');   }
+        await page.click('div[class="row suggestedReservations"]'); }
+
+    if(tidigareTid==false&&teoriprov==false){
+        await page.waitForSelector('select[id="examination-type-select"]');
+        await page.click('select[id="examination-type-select"]');
+        await page.click('option[value="50"]');
+    }
 
      //går till din pesonliga sida
     
@@ -49,15 +56,22 @@ const tidigareTid = true;
 
     await page.waitForSelector('input[id=id-control-searchText-1-1]');
 
-    //page.url() = trafikvarket2;
+    trafikvarket2 = page.url();
 
     await page.type('input[id=id-control-searchText-1-1]', stad);
 
     await page.keyboard.press('Enter');
 
-
-
-        
+    
+  try {
+    await page.waitForSelector('a[class="hidden-xs pull-right"]', {timeout: 5000});
+  } catch (e) {
+    if (e) {
+        console.log('Det fanns inga lediga tider :(')
+        browser.close();
+    }
+  }
+    
         
 
     const data = await page.evaluate(
@@ -66,9 +80,7 @@ const tidigareTid = true;
       );
       console.log(data.length);
 
-      if(data.length==0){
-          console.log('Det fanns inga lediga tider :(')
-      }else{
+     if(data.length==0){console.log('hittade inget i strong')}else{
 
       tid = data[0]
       console.log(data);
@@ -84,9 +96,7 @@ const tidigareTid = true;
       console.log(day);
 
         
-
-      }
-    
+     }
 
     //const Txt = await el.getProperty('textContent');
     //const rawTxt = await Txt.jsonValue();

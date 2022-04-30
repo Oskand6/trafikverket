@@ -8,16 +8,19 @@ trafikvarket1('https://fp.trafikverket.se/Boka/#/licence');
 
 async function trafikvarket1(url) {
 
-    
-const personnummer = '200412063596';
+    //bil = 200412063596 
+const personnummer = '200403305378';
 const stad = 'Örebro';
-const körkort = 'B';
-const tidigareTid = false;
-    
+const körkort = 'A2';
+const tidigareTid = true;
+//const dinTid = tidigastdatum;
+//2022-03-30 format 
+//behöver inte svaras på om tidigareTid = false
+
     const browser = await puppeteer.launch({headless: false})
     const page = await browser.newPage();
     await page.goto(url);
-
+    
     await page.waitForSelector('input[id=social-security-number-input]');
 
     await page.type('input[id=social-security-number-input]', personnummer);
@@ -31,7 +34,7 @@ const tidigareTid = false;
     if(körkort=='B')
     await page.click('a[title="B"]');
 
-    //await page.waitFor(200000000);
+   
 
     if(tidigareTid){
     await page.waitForSelector('div[class="row alreadyBookedExamination"]');
@@ -40,7 +43,9 @@ const tidigareTid = false;
         await page.waitForSelector('div[class="row suggestedReservations"]');
         await page.click('div[class="row suggestedReservations"]');   }
 
-    //går till din pesonliga sida
+     //går till din pesonliga sida
+    
+     //await page.waitFor(200000000);
 
     await page.waitForSelector('input[id=id-control-searchText-1-1]');
 
@@ -52,17 +57,22 @@ const tidigareTid = false;
 
 
 
-        await page.waitFor(2000);
-
+        
+        
 
     const data = await page.evaluate(
         () =>  Array.from(document.querySelectorAll('strong'))
                     .map(elem => elem.innerText)
       );
-      console.log(data);
+      console.log(data.length);
 
-      const tid = data[0].substring(0,10);
-      console.log(tid);
+      if(data.length==0){
+          console.log('Det fanns inga lediga tider :(')
+      }else{
+
+      tid = data[0]
+      console.log(data);
+        tid=tid.substring(0,10);
 
       const year = tid.substring(0,4);
       console.log(year);
@@ -73,8 +83,10 @@ const tidigareTid = false;
       const day = tid.substring(8,10);
       console.log(day);
 
-        const dinTid = tidigastdatum;//2022-03-30 format
+        
 
+      }
+    
 
     //const Txt = await el.getProperty('textContent');
     //const rawTxt = await Txt.jsonValue();

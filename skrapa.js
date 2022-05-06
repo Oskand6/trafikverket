@@ -2,10 +2,10 @@ const puppeteer = require('puppeteer');
 
 
 trafikvarket1('https://fp.trafikverket.se/Boka/#/licence');
-trafikvarket2('Inget här än');
+trafikvarket2('https://fp.trafikverket.se/Boka/#/licence');
 
 
-async function trafikvarket1(url) {
+
 
     // 200412063596 200403305378
 const personnummer = '200412063596';
@@ -17,6 +17,8 @@ const teoriprov = false;
 //const dinTid = tidigastdatum;
 //2022-03-30 format 
 //behöver inte svaras på om tidigareTid = false
+
+async function trafikvarket1(url) {
 
     const browser = await puppeteer.launch({headless: false})
     const page = await browser.newPage();
@@ -102,6 +104,12 @@ const teoriprov = false;
     //const rawTxt = await Txt.jsonValue();
    // const value = await element.evaluate(el => el.textContent);
     //console.log(value);
+
+
+    async function trafikvarket2(url) {
+      const page = await browser.newPage();
+    await page.goto(url);
+    } 
 
     browser.close();
 }
